@@ -1,0 +1,170 @@
+%% -*- coding: utf-8 -*-
+\documentclass[14pt,a4paper]{scrartcl} 
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{indentfirst}
+\usepackage{misccorr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\begin{document}
+	\begin{titlepage}
+		\begin{center}
+			\large
+			МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ
+			
+			Федеральное государственное бюджетное образовательное учреждение высшего образования
+			
+			\textbf{АДЫГЕЙСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ}
+			\vspace{0.25cm}
+			
+			Инженерно-физический факультет
+			
+			Кафедра автоматизированных систем обработки информации и управления
+			\vfill
+
+			\vfill
+			
+			\textsc{Отчет по практике}\\[5mm]
+			
+			{\LARGE Создать программу для обработки изображений, которая будет
+выполнять следующие функции: изменение яркости, контрастности и
+насыщенности цветов}
+			\bigskip
+			
+			2 курс, группа 2ИВТ2
+		\end{center}
+		\vfill
+		
+		\newlength{\ML}
+		\settowidth{\ML}{«\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}}}
+		\hfill\begin{minipage}{0.5\textwidth}
+			Выполнил:\\
+			\underline{\hspace{\ML}} С.\,С.~Васюк\\
+			«\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}} 2024 г.
+		\end{minipage}%
+		\bigskip
+		
+		\hfill\begin{minipage}{0.5\textwidth}
+			Руководитель:\\
+			\underline{\hspace{\ML}} С.\,В.~Теплоухов\\
+			«\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}} 2024 г.
+		\end{minipage}%
+		\vfill
+		
+		\begin{center}
+			Майкоп, 2024 г.
+		\end{center}
+	\end{titlepage}
+\tableofcontents
+\newpage
+\section{Введение}
+Для разработки алгоритма использовалась среда разработки Visual Studio (в дальнейшем VS) на языке прогроммирования С++, а также специальная библиотека OpenCV для работы с изображениями и видео. При открытии VS запускается следующее окно (рисунок 1):
+\begin{figure}[h!]
+    \centering
+    \includegraphics [width=0.9\textwidth]{pic1}\\
+    \caption{Окно запуска проектов Visual Studio}
+    \label{fig:pic1}
+\end{figure}
+
+\newpage
+
+Для отрытия проекта необходимо кликнуть на нужное наименование после чего проект благополучно запуститься и можно начинать редактирование и компиляцию кода (рисунок 2): 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics [width=0.9\textwidth]{pic2}\\
+    \caption{Окно проекта Visual Studio}
+    \label{fig:pic2}
+\end{figure}
+
+\newpage
+\section{Работа программы}
+На рисунке 2 можно увидеть алгоритм решения задачи на редактирование изображения по трём параметрам: яркость, контрастность и насыщенность. После запуска программы необходимо ввести путь к изображению, а после указать значения параметров. Результат его работы отображён на рисунке 3:
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics [width=0.9\textwidth]{pic3}\\
+    \caption{Окно проекта Visual Studio}
+    \label{fig:pic3}
+\end{figure}
+\newpage
+\section{Код программы}
+
+
+\begin{verbatim}
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+    setlocale(LC_ALL, "Russian");
+    string picDerectory;
+    cout << "Введите путь к изображению 
+    (например: F:\\manga\\01-02-02bratva001.jpeg):" << endl;
+    cin >> picDerectory;
+    Mat image = imread(picDerectory);
+    resize(image, image, Size(500, 500));
+    
+    if (image.empty())
+    {
+        cout << "Could not open or find the image" << endl;
+        cin.get();
+        return -1;
+    }
+
+    int brighness = 0;
+    int contrast = 0;
+    int saturation = 0;
+    int count;
+    cout << "Введите параметр яркости (от -100 до 100): " << endl;
+    cin >> brighness;
+    cout << "Введите параметр контрастности (от -10 до 10): " << endl;
+    cin >> contrast;
+    cout << "Введите параметр цветовой насыщенности (от -10 до 10): " 
+    << endl;
+    cin >> saturation;
+
+    Mat imageBrighnessHigh50;
+    Mat convertedHSV;
+    image.convertTo(imageBrighnessHigh50, -1, contrast, brighness); 
+        
+    cvtColor(imageBrighnessHigh50, convertedHSV, COLOR_BGR2HSV);
+    Mat HSVChannels[3];
+    split(convertedHSV, HSVChannels);
+    HSVChannels[1] *= saturation;
+    merge(HSVChannels, 3, imageBrighnessHigh50);
+    cvtColor(imageBrighnessHigh50, imageBrighnessHigh50, COLOR_HSV2BGR);
+
+    String windowNameOriginalImage = "Оригинальное изображение";
+    String windowNameBrightnessHigh50 = "Отредактированное изображение";
+
+    namedWindow(windowNameOriginalImage, WINDOW_NORMAL);
+    namedWindow(windowNameBrightnessHigh50, WINDOW_NORMAL);
+
+    imshow(windowNameOriginalImage, image);
+    imshow(windowNameBrightnessHigh50, imageBrighnessHigh50);
+    waitKey(0); 
+    destroyAllWindows();
+    return 0;
+}
+\end{verbatim}
+
+\newpage
+\section{Список используемой литературы}
+
+\begin{enumerate}
+
+\item ОБРАБОТКА ИЗОБРАЖЕНИЙ В C++ С ПОМОЩЬЮ БИБЛИОТЕКИ OpenCV //
+Universum: технические науки : электрон. научн. журн. Самандаров И.Р. [и др.]. 2023. 5(110). 
+URL: https://7universum.com/ru/tech/
+archive/item/15484
+\item Официальная документация Open Source Computer Vision. 
+
+URL: https://docs.opencv.org/4.9.0/examples.html
+\end{enumerate}
+
+\end{document}
